@@ -297,34 +297,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   itemBuilder: (context, index) {
                     final product = products[index];
                     return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.grey[200],
-                          child: product['image_path'] != null
-                              ? Image.network(product['image_path'])
-                              : const Icon(Icons.image, color: Colors.grey),
-                        ),
-                        title: Text(
-                          product['name'],
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (product['description'] != null)
-                              Text(product['description']),
-                            const SizedBox(height: 4),
-                            Text(
-                              '¥${product['price'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        trailing: const Icon(Icons.arrow_forward_ios),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      elevation: 2,
+                      child: InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
@@ -336,6 +311,110 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             ),
                           );
                         },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 商品画像エリア
+                            Container(
+                              width: double.infinity,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(12),
+                                  topRight: Radius.circular(12),
+                                ),
+                              ),
+                              child: product['image_path'] != null
+                                  ? ClipRRect(
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(12),
+                                        topRight: Radius.circular(12),
+                                      ),
+                                      child: Image.network(
+                                        product['image_path'],
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return const Center(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.broken_image, 
+                                                     size: 40, 
+                                                     color: Colors.grey),
+                                                SizedBox(height: 4),
+                                                Text('No Image',
+                                                     style: TextStyle(
+                                                       color: Colors.grey,
+                                                       fontSize: 12,
+                                                     )),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    )
+                                  : const Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.image_not_supported, 
+                                               size: 40, 
+                                               color: Colors.grey),
+                                          SizedBox(height: 4),
+                                          Text('No Image',
+                                               style: TextStyle(
+                                                 color: Colors.grey,
+                                                 fontSize: 12,
+                                                 fontWeight: FontWeight.w500,
+                                               )),
+                                        ],
+                                      ),
+                                    ),
+                            ),
+                            // 商品情報エリア
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // 商品名
+                                  Text(
+                                    product['name'],
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  // 価格
+                                  Text(
+                                    '¥${product['price'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).primaryColor,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  // 説明
+                                  if (product['description'] != null)
+                                    Text(
+                                      product['description'],
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
