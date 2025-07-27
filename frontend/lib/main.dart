@@ -375,42 +375,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             // 商品情報エリア
                             Padding(
                               padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // 商品名
-                                  Text(
-                                    product['name'],
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  // 価格
-                                  Text(
-                                    '¥${product['price'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).primaryColor,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  // 説明
-                                  if (product['description'] != null)
-                                    Text(
-                                      product['description'],
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                ],
+                              child: Text(
+                                product['name'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
