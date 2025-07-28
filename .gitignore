@@ -1,30 +1,23 @@
-# 環境設定ファイル（機密情報含む）
 .env
 .env.local
 .env.*.local
 
-# Dockerボリューム
 volumes/
 
-# ログファイル
 *.log
 logs/
 
-# OSファイル
 .DS_Store
 Thumbs.db
 
-# IDEファイル
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# テンポラリファイル
 *.tmp
 *.temp
 
-# Laravel固有
 backend/storage/logs/
 backend/storage/framework/cache/
 backend/storage/framework/sessions/
@@ -32,7 +25,6 @@ backend/storage/framework/views/
 backend/vendor/
 backend/node_modules/
 
-# Flutter固有
 frontend/.dart_tool/
 frontend/.packages
 frontend/.pub-cache/
@@ -40,3 +32,6 @@ frontend/.pub/
 frontend/build/
 frontend/.flutter-plugins
 frontend/.flutter-plugins-dependencies
+
+CLAUDE.md
+.claude
