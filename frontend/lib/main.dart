@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 void main() {
   runApp(const ShopProductsApp());
@@ -126,9 +128,11 @@ class _ShopListScreenState extends State<ShopListScreen> {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: 商品登録画面へ遷移
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('商品登録画面を開きます')),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProductRegistrationScreen(),
+            ),
           );
         },
         tooltip: '商品登録',
@@ -393,9 +397,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: 商品追加画面へ遷移
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${widget.shop['name']}に商品を追加')),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductRegistrationScreen(selectedShop: widget.shop),
+            ),
           );
         },
         tooltip: '商品追加',
@@ -613,6 +619,389 @@ class ProductDetailScreen extends StatelessWidget {
             child: Text(value),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ProductRegistrationScreen extends StatefulWidget {
+  final Map<String, dynamic>? selectedShop;
+
+  const ProductRegistrationScreen({super.key, this.selectedShop});
+
+  @override
+  State<ProductRegistrationScreen> createState() => _ProductRegistrationScreenState();
+}
+
+class _ProductRegistrationScreenState extends State<ProductRegistrationScreen> {
+  final TextEditingController _productNameController = TextEditingController();
+  final List<Map<String, dynamic>> _selectedShops = [];
+  final List<Map<String, dynamic>> _availableShops = [
+    {'id': 1, 'name': 'サンプル書店'},
+    {'id': 2, 'name': 'おしゃれ雑貨店'},
+    {'id': 3, 'name': 'カフェ用品専門店'},
+  ];
+  bool _isLoading = false;
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selectedShop != null) {
+      _selectedShops.add(widget.selectedShop!);
+    }
+  }
+
+  @override
+  void dispose() {
+    _productNameController.dispose();
+    super.dispose();
+  }
+
+  void _toggleShopSelection(Map<String, dynamic> shop) {
+    setState(() {
+      final index = _selectedShops.indexWhere((s) => s['id'] == shop['id']);
+      if (index >= 0) {
+        _selectedShops.removeAt(index);
+      } else {
+        _selectedShops.add(shop);
+      }
+    });
+  }
+
+  bool _isShopSelected(Map<String, dynamic> shop) {
+    return _selectedShops.any((s) => s['id'] == shop['id']);
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? image = await _picker.pickImage(source: source);
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('画像の選択に失敗しました: $e')),
+        );
+      }
+    }
+  }
+
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('カメラで撮影'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('ギャラリーから選択'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              if (_selectedImage != null)
+                ListTile(
+                  leading: const Icon(Icons.delete),
+                  title: const Text('画像を削除'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _selectedImage = null;
+                    });
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _registerProduct() async {
+    if (_productNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('商品名を入力してください')),
+      );
+      return;
+    }
+
+    if (_selectedShops.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('販売店を選択してください')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_productNameController.text}を登録しました'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('登録に失敗しました: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('商品登録'),
+        actions: [
+          TextButton(
+            onPressed: _isLoading ? null : _registerProduct,
+            child: _isLoading 
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('登録', style: TextStyle(fontSize: 16)),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '商品画像',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: _showImageSourceDialog,
+              child: Container(
+                width: double.infinity,
+                height: 200,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[50],
+                ),
+                child: _selectedImage != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          _selectedImage!,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_a_photo,
+                            size: 48,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'タップして画像を選択',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'カメラ撮影またはギャラリーから選択',
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            Text(
+              '商品名 *',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _productNameController,
+              decoration: const InputDecoration(
+                hintText: '商品名を入力してください',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.shopping_bag),
+              ),
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
+            
+            const SizedBox(height: 24),
+            
+            Text(
+              '販売店 * (複数選択可)',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: _availableShops.map((shop) {
+                  final isSelected = _isShopSelected(shop);
+                  return InkWell(
+                    onTap: () => _toggleShopSelection(shop),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey[200]!,
+                            width: 0.5,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                            color: isSelected ? Theme.of(context).primaryColor : Colors.grey,
+                          ),
+                          const SizedBox(width: 12),
+                          const Icon(Icons.store, size: 20, color: Colors.grey),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              shop['name'],
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected ? Theme.of(context).primaryColor : Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            
+            if (_selectedShops.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '選択された販売店 (${_selectedShops.length}店舗)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: _selectedShops.map((shop) {
+                        return Chip(
+                          avatar: const Icon(Icons.store, size: 16),
+                          label: Text(shop['name']),
+                          onDeleted: () => _toggleShopSelection(shop),
+                          deleteIcon: const Icon(Icons.close, size: 18),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            
+            const SizedBox(height: 32),
+            
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: _isLoading ? null : _registerProduct,
+                icon: _isLoading 
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.add_shopping_cart),
+                label: Text(_isLoading ? '登録中...' : '商品を登録'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
