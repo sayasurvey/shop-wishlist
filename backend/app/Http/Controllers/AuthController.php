@@ -15,7 +15,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
         ], [
             'name.required' => '名前は必須です。',
             'name.string' => '名前は文字列で入力してください。',
@@ -28,7 +28,6 @@ class AuthController extends Controller
             'password.required' => 'パスワードは必須です。',
             'password.string' => 'パスワードは文字列で入力してください。',
             'password.min' => 'パスワードは8文字以上で入力してください。',
-            'password.confirmed' => 'パスワード確認が一致しません。',
         ]);
 
         $user = User::create([
