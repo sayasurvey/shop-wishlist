@@ -12,7 +12,7 @@ class ShopProductsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'お店毎商品管理',
+      title: '店舗毎商品管理',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -41,7 +41,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
 
   Future<void> loadShops() async {
     try {
-      // TODO: Laravel APIからお店一覧を取得
+      // TODO: Laravel APIから店舗一覧を取得
       // 現在はサンプルデータを表示
       await Future.delayed(const Duration(seconds: 1));
       setState(() {
@@ -69,7 +69,7 @@ class _ShopListScreenState extends State<ShopListScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('お店一覧'),
+        title: const Text('店舗一覧'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -91,9 +91,9 @@ class _ShopListScreenState extends State<ShopListScreen> {
                     children: [
                       Icon(Icons.store, size: 64, color: Colors.grey),
                       SizedBox(height: 16),
-                      Text('お店が登録されていません'),
+                      Text('店舗が登録されていません'),
                       SizedBox(height: 8),
-                      Text('商品を登録してお店を作成してください'),
+                      Text('商品を登録して店舗を作成してください'),
                     ],
                   ),
                 )
