@@ -50,7 +50,7 @@ class ShopController extends Controller
     public function destroy(Shop $shop)
     {
         $shop->delete();
-        return response()->json(['message' => 'お店を削除しました。']);
+        return response()->json(['message' => '店舗を削除しました。']);
     }
 
     // /**
