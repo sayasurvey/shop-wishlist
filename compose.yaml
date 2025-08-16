@@ -27,7 +27,7 @@ services:
     ports:
       - "${NUXT_PORT:-3000}:3000"
     volumes:
-      - ./front:/app
+      - ./frontend:/app
     command: sh -c "npm install && npm run dev"
 
   mysql:
