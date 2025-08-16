@@ -53,12 +53,12 @@ class ShopController extends Controller
         return response()->json(['message' => '店舗を削除しました。']);
     }
 
-    // /**
-    //  * Get products for a specific shop.
-    //  */
-    // public function products(Shop $shop)
-    // {
-    //     $products = $shop->products;
-    //     return response()->json($products);
-    // }
+    /**
+     * Get products for a specific shop.
+     */
+    public function products(Shop $shop)
+    {
+        $products = $shop->products;
+        return response()->json($products);
+    }
 }

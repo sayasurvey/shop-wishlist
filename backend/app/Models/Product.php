@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Shop extends Model
+class Product extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
+        'image_path',
     ];
 
     protected $hidden = [
@@ -18,8 +19,12 @@ class Shop extends Model
         'updated_at',
     ];
 
-    public function products()
+    protected $with = ['shops'];
+
+    protected $appends = [];
+
+    public function shops()
     {
-        return $this->belongsToMany(Product::class)->select('products.id', 'products.name');
+        return $this->belongsToMany(Shop::class)->select('shops.id', 'shops.name');
     }
 }
