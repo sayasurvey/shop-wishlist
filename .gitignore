@@ -26,6 +26,7 @@ backend/vendor/
 backend/node_modules/
 
 front/node_modules/*
+front/.nuxt/
 
 CLAUDE.md
 .claude
