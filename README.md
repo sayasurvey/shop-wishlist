@@ -3,7 +3,7 @@
 SNSで見つけた気になる商品を店舗毎に整理・管理できるアプリケーション。
 
 ## 技術スタック
-- **フロントエンド**: Flutter (ローカル実行)
+- **フロントエンド**: Nuxt (Docker)
 - **バックエンド**: Laravel (Docker)
 - **データベース**: MySQL (Docker)
 
@@ -27,20 +27,8 @@ docker-compose up -d
 docker compose up -d
 ```
 
-### 3. Flutter環境の起動
-```bash
-# Flutterディレクトリに移動
-cd frontend
-
-# 依存関係のインストール
-flutter pub get
-
-# Web開発サーバーの起動
-flutter run -d web-server --web-port 3000 --web-hostname 0.0.0.0
-```
-
 ## アクセス方法
-- **Flutter Web**: http://localhost:3000
+- **Nuxt Web**: http://localhost:3000
 - **Laravel API**: http://localhost:8000
 - **MySQL**: localhost:3306
 
