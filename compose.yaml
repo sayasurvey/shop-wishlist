@@ -21,6 +21,15 @@ services:
     depends_on:
       - mysql
 
+  nuxt:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - "${NUXT_PORT:-3000}:3000"
+    volumes:
+      - ./front:/app
+    command: sh -c "npm install && npm run dev"
+
   mysql:
     image: mysql:8.0
     ports:

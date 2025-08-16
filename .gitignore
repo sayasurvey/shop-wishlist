@@ -25,5 +25,7 @@ backend/storage/framework/views/
 backend/vendor/
 backend/node_modules/
 
+front/node_modules/*
+
 CLAUDE.md
 .claude
